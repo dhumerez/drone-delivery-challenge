@@ -1,0 +1,13 @@
+C:\Users\Usuario\source\repos\DroneDeliveryService\DroneDeliveryService\bin\Debug\netcoreapp3.1\DroneDeliveryService.exe
+C:\Users\Usuario\source\repos\DroneDeliveryService\DroneDeliveryService\bin\Debug\netcoreapp3.1\DroneDeliveryService.deps.json
+C:\Users\Usuario\source\repos\DroneDeliveryService\DroneDeliveryService\bin\Debug\netcoreapp3.1\DroneDeliveryService.runtimeconfig.json
+C:\Users\Usuario\source\repos\DroneDeliveryService\DroneDeliveryService\bin\Debug\netcoreapp3.1\DroneDeliveryService.runtimeconfig.dev.json
+C:\Users\Usuario\source\repos\DroneDeliveryService\DroneDeliveryService\bin\Debug\netcoreapp3.1\DroneDeliveryService.dll
+C:\Users\Usuario\source\repos\DroneDeliveryService\DroneDeliveryService\bin\Debug\netcoreapp3.1\DroneDeliveryService.pdb
+C:\Users\Usuario\source\repos\DroneDeliveryService\DroneDeliveryService\obj\Debug\netcoreapp3.1\DroneDeliveryService.csproj.AssemblyReference.cache
+C:\Users\Usuario\source\repos\DroneDeliveryService\DroneDeliveryService\obj\Debug\netcoreapp3.1\DroneDeliveryService.AssemblyInfoInputs.cache
+C:\Users\Usuario\source\repos\DroneDeliveryService\DroneDeliveryService\obj\Debug\netcoreapp3.1\DroneDeliveryService.AssemblyInfo.cs
+C:\Users\Usuario\source\repos\DroneDeliveryService\DroneDeliveryService\obj\Debug\netcoreapp3.1\DroneDeliveryService.csproj.CoreCompileInputs.cache
+C:\Users\Usuario\source\repos\DroneDeliveryService\DroneDeliveryService\obj\Debug\netcoreapp3.1\DroneDeliveryService.dll
+C:\Users\Usuario\source\repos\DroneDeliveryService\DroneDeliveryService\obj\Debug\netcoreapp3.1\DroneDeliveryService.pdb
+C:\Users\Usuario\source\repos\DroneDeliveryService\DroneDeliveryService\obj\Debug\netcoreapp3.1\DroneDeliveryService.genruntimeconfig.cache
