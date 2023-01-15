@@ -1,34 +1,72 @@
 ﻿using DroneDeliveryService.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace DroneDeliveryService.Utils
 {
     public class Scheduler
     {
-        public static List<Schedule> Generate(DeliveryElements deliveryElements)
+        //public static List<Schedule> Generate(DeliveryElements deliveryElements)
+        //{
+        //    List<Schedule> schedules = new List<Schedule>();
+        //    List<Location> locationsLeft = new List<Location>();
+        //    IDictionary<Drone, List<Trip>> droneTrips = new Dictionary<Drone, List<Trip>>();
+
+        //    locationsLeft.AddRange(deliveryElements.Locations);
+        //    foreach (var drone in deliveryElements.Drones)
+        //    {
+        //        droneTrips.Add(drone, new List<Trip>());
+        //    }
+        //    while (deliveryElements.Drones.Count > 0 && locationsLeft.Count > 0)
+        //    {
+        //        foreach(var drone in deliveryElements.Drones)
+        //        {
+        //            var tripsForDrone = GetScheduledTripsDrone(drone, schedules);
+        //            var locationsPicked = PickLocationsForCapacity(drone.Capacity, locationsLeft);
+
+        //            if(locationsPicked.Count > 0)
+        //            {
+        //                locationsLeft = locationsLeft.Except(locationsPicked).ToList();
+        //                tripsForDrone.Add(new Trip() { Locations =  locationsPicked});
+        //            }
+
+        //            schedules.Add(new Schedule() { DroneSubject = drone, Trips = tripsForDrone });
+        //            droneTrips[drone] = tripsForDrone;
+        //        }
+        //    }
+        //    return schedules;
+        //}
+
+        public static IDictionary<Drone, List<Trip>> Generate(DeliveryElements deliveryElements)
         {
-            List<Schedule> schedules = new List<Schedule>();
             List<Location> locationsLeft = new List<Location>();
+            IDictionary<Drone, List<Trip>> droneTrips = new Dictionary<Drone, List<Trip>>();
+
             locationsLeft.AddRange(deliveryElements.Locations);
-            while (deliveryElements.Drones.Count > 0 && locationsLeft.Count > 0)
+            foreach (var drone in deliveryElements.Drones)
             {
-                foreach(var drone in deliveryElements.Drones)
+                droneTrips.Add(drone, new List<Trip>());
+            }
+            while (locationsLeft.Count > 0)
+            {
+                foreach (var drone in deliveryElements.Drones)
                 {
-                    var tripsForDrone = GetScheduledTripsDrone(drone, schedules);
+                    var tripsForDrone = droneTrips[drone];
                     var locationsPicked = PickLocationsForCapacity(drone.Capacity, locationsLeft);
 
-                    if(locationsPicked.Count > 0)
+                    if (locationsPicked.Count > 0)
                     {
                         locationsLeft = locationsLeft.Except(locationsPicked).ToList();
-                        tripsForDrone.Add(new Trip() { Locations =  locationsPicked});
+                        tripsForDrone.Add(new Trip() { Locations = locationsPicked });
                     }
 
-                    schedules.Add(new Schedule() { DroneSubject = drone, Trips = tripsForDrone });
+                    droneTrips[drone] = tripsForDrone;
                 }
             }
-            return schedules;
+            return droneTrips;
         }
+
         private static decimal CalculateLoadForLocations(List<Location> locations)
         {
             var sum = locations.Aggregate(0m,
@@ -47,38 +85,47 @@ namespace DroneDeliveryService.Utils
                 var currentLoad = CalculateLoadForLocations(locationsPicked);
                 remainingCapacity = droneMaxWeight - currentLoad;
 
-                if (locations[i].Weight < remainingCapacity && locations.Count > 1)
+                if (locations[i].Weight < droneMaxWeight && locations.Count > 1)
                 {
-                    locations.RemoveRange(0, i+1);
-                    List<Location> found = PickLocationsForCapacity(remainingCapacity - locations[i].Weight, locations);
-                    if(found.Count > 0)
+                    //locations.RemoveRange(0, i+1);
+                    var itemToRemove = locations.SingleOrDefault(r => r == locations[i]);
+                    if (itemToRemove != null)
+                        locations.Remove(itemToRemove);
+
+                    List<Location> found = PickLocationsForCapacity(remainingCapacity /*- locations[i].Weight*/, locations);
+                    bool isEmpty= IsEmpty(found);
+
+                    if (isEmpty)
                     {
-                        locationsPicked.Add(locations[i]);
+                        return locationsPicked;
+                    }
+                    if (found.Count > 0)
+                    {
+                        //locationsPicked.Add(locations[i]);
                         locationsPicked.AddRange(found);
                         return locationsPicked;
                     }
-                }else if (locations[i].Weight <= remainingCapacity)
+
+                }
+                else if (locations[i].Weight <= droneMaxWeight)
                 {
-                    locationsPicked.Add(locations[i]);
+                    //locationsPicked.Add(locations[i]);
                     return locationsPicked;
                 }
-
+                locationsPicked = null;
                 return locationsPicked;
             }
             return locationsPicked;
         }
 
-        private static List<Trip> GetScheduledTripsDrone(Drone drone, List<Schedule> schedules)
+        public static bool IsEmpty<T>(List<T> list)
         {
-            List<Trip> trips = new List<Trip>();
-            foreach(var schedule in schedules)
+            if (list == null)
             {
-                if(schedule.DroneSubject == drone)
-                {
-                    trips.AddRange(schedule.Trips);
-                }
+                return true;
             }
-            return trips;
+
+            return !list.Any();
         }
     }
 }

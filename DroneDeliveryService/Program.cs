@@ -1,6 +1,7 @@
 ﻿using DroneDeliveryService.Utils;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace DroneDeliveryService
 {
@@ -15,18 +16,25 @@ namespace DroneDeliveryService
             var objects = Loader.loadFromFile(file);
             var list = Scheduler.Generate(objects);
 
+            int tripNumber = 1;
+            int droneNumber = 1;
             foreach(var instance in list)
             {
                 //We use the System library to print the output
-                Console.WriteLine(instance.DroneSubject.Name);
-                foreach(var trip in instance.Trips)
+                Console.WriteLine("[Drone #" + droneNumber + " " + instance.Key.Name + "]");
+                droneNumber++;
+                foreach(var trip in instance.Value)
                 {
-                    foreach(var location in trip.Locations)
-                    {
-                        Console.Write(location.Name + " ");
-                    }
+                    Console.WriteLine("Trip " + "#" + tripNumber );
+
+                    string allAddresses = string.Join(", ", trip.Locations.Select(s => s.Name ));
+                    Console.Write(allAddresses);
+                    decimal total = trip.Locations.Sum(item => item.Weight);
+                    Console.Write(" Total:" + total);
+                    tripNumber++;
                     Console.WriteLine();
                 }
+                tripNumber = 1;
             }
             Console.ReadLine();
         }
