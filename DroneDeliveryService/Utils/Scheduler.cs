@@ -1,28 +1,30 @@
 ﻿using DroneDeliveryService.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace DroneDeliveryService.Utils
 {
     public class Scheduler
-    {
+    {        
         public static IDictionary<Drone, List<Trip>> Generate(DeliveryElements deliveryElements)
         {
             List<Location> locationsLeft = new List<Location>();
             IDictionary<Drone, List<Trip>> droneTrips = new Dictionary<Drone, List<Trip>>();
 
             locationsLeft.AddRange(deliveryElements.Locations);
+
             foreach (var drone in deliveryElements.Drones)
             {
                 droneTrips.Add(drone, new List<Trip>());
             }
+
             while (locationsLeft.Count > 0)
             {
                 foreach (var drone in deliveryElements.Drones)
                 {
                     var tripsForDrone = droneTrips[drone];
-                    var locationsPicked = PickLocationsForCapacity(drone.Capacity, locationsLeft);
+                    List<Location> locationsPicked = LoadDrones(locationsLeft, drone.Capacity);
 
                     if (locationsPicked.Count > 0)
                     {
@@ -36,62 +38,33 @@ namespace DroneDeliveryService.Utils
             return droneTrips;
         }
 
-        private static decimal CalculateLoadForLocations(List<Location> locations)
+        // This method makes runs of adjacent elements to find the closest sum of elements to the target.
+        // Returns the list of Locations which weights sum get closer to the target value.
+        static List<Location> LoadDrones(List<Location> elements, decimal target)
         {
-            var sum = locations.Aggregate(0m,
-                    (accum, loc) => accum + loc.Weight);
-            return sum;
-        }
+            Solution bestSolution = new Solution { StartIndex = 0, EndIndex = -1, Sum = 0 };
+            decimal bestError = Math.Abs(target);
+            Solution currentSolution = new Solution { StartIndex = 0, Sum = 0 };
 
-        private static List<Location> PickLocationsForCapacity(decimal droneMaxWeight, List<Location> locations)
-        {
-            List<Location> locationsPicked = new List<Location>();
-            decimal remainingCapacity;
-
-            for (int i = 0; i < locations.Count; i++)
+            for (int i = 0; i < elements.Count; i++)
             {
-                locationsPicked.Add(locations[i]);
-                var currentLoad = CalculateLoadForLocations(locationsPicked);
-                remainingCapacity = droneMaxWeight - currentLoad;
-
-                if (locations[i].Weight < droneMaxWeight && locations.Count > 1)
+                currentSolution.EndIndex = i;
+                currentSolution.Sum += elements[i].Weight;
+                while (elements[currentSolution.StartIndex].Weight <= currentSolution.Sum - target)
                 {
-                    var itemToRemove = locations.SingleOrDefault(r => r == locations[i]);
-                    if (itemToRemove != null)
-                        locations.Remove(itemToRemove);
-
-                    List<Location> found = PickLocationsForCapacity(remainingCapacity, locations);
-                    bool isEmpty= IsEmpty(found);
-
-                    if (isEmpty)
-                    {
-                        return locationsPicked;
-                    }
-                    if (found.Count > 0)
-                    {
-                        locationsPicked.AddRange(found);
-                        return locationsPicked;
-                    }
-
+                    currentSolution.Sum -= elements[currentSolution.StartIndex].Weight;
+                    ++currentSolution.StartIndex;
                 }
-                else if (locations[i].Weight <= droneMaxWeight)
+                decimal currentError = Math.Abs(currentSolution.Sum - target);
+                if (currentError < bestError || currentError == bestError && currentSolution.Length < bestSolution.Length)
                 {
-                    return locationsPicked;
+                    bestError = currentError;
+                    bestSolution.Sum = currentSolution.Sum;
+                    bestSolution.StartIndex = currentSolution.StartIndex;
+                    bestSolution.EndIndex = currentSolution.EndIndex;
                 }
-                locationsPicked = null;
-                return locationsPicked;
             }
-            return locationsPicked;
-        }
-
-        public static bool IsEmpty<T>(List<T> list)
-        {
-            if (list == null)
-            {
-                return true;
-            }
-
-            return !list.Any();
+            return elements.GetRange(bestSolution.StartIndex, bestSolution.Length);
         }
     }
 }

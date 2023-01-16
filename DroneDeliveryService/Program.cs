@@ -21,15 +21,16 @@ namespace DroneDeliveryService
             foreach(var instance in list)
             {
                 //We use the System library to print the output
-                Console.WriteLine("[Drone #" + droneNumber + " " + instance.Key.Name + "]");
+                Console.WriteLine("[Drone #" + droneNumber + " " + instance.Key.Name + "] Capacity: " + instance.Key.Capacity);
                 droneNumber++;
                 foreach(var trip in instance.Value)
                 {
                     Console.WriteLine("Trip " + "#" + tripNumber );
 
-                    string allAddresses = string.Join(", ", trip.Locations.Select(s => s.Name ));
+                    string allAddresses = string.Join(", ", trip.Locations.Select(s => s.Name));
                     Console.Write(allAddresses);
                     decimal total = trip.Locations.Sum(item => item.Weight);
+                    Console.Write(" [Total: " + total + "]");
                     tripNumber++;
                     Console.WriteLine();
                 }
