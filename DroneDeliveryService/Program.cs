@@ -30,7 +30,6 @@ namespace DroneDeliveryService
                     string allAddresses = string.Join(", ", trip.Locations.Select(s => s.Name ));
                     Console.Write(allAddresses);
                     decimal total = trip.Locations.Sum(item => item.Weight);
-                    Console.Write(" Total:" + total);
                     tripNumber++;
                     Console.WriteLine();
                 }

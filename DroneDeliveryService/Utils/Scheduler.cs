@@ -7,37 +7,6 @@ namespace DroneDeliveryService.Utils
 {
     public class Scheduler
     {
-        //public static List<Schedule> Generate(DeliveryElements deliveryElements)
-        //{
-        //    List<Schedule> schedules = new List<Schedule>();
-        //    List<Location> locationsLeft = new List<Location>();
-        //    IDictionary<Drone, List<Trip>> droneTrips = new Dictionary<Drone, List<Trip>>();
-
-        //    locationsLeft.AddRange(deliveryElements.Locations);
-        //    foreach (var drone in deliveryElements.Drones)
-        //    {
-        //        droneTrips.Add(drone, new List<Trip>());
-        //    }
-        //    while (deliveryElements.Drones.Count > 0 && locationsLeft.Count > 0)
-        //    {
-        //        foreach(var drone in deliveryElements.Drones)
-        //        {
-        //            var tripsForDrone = GetScheduledTripsDrone(drone, schedules);
-        //            var locationsPicked = PickLocationsForCapacity(drone.Capacity, locationsLeft);
-
-        //            if(locationsPicked.Count > 0)
-        //            {
-        //                locationsLeft = locationsLeft.Except(locationsPicked).ToList();
-        //                tripsForDrone.Add(new Trip() { Locations =  locationsPicked});
-        //            }
-
-        //            schedules.Add(new Schedule() { DroneSubject = drone, Trips = tripsForDrone });
-        //            droneTrips[drone] = tripsForDrone;
-        //        }
-        //    }
-        //    return schedules;
-        //}
-
         public static IDictionary<Drone, List<Trip>> Generate(DeliveryElements deliveryElements)
         {
             List<Location> locationsLeft = new List<Location>();
@@ -87,12 +56,11 @@ namespace DroneDeliveryService.Utils
 
                 if (locations[i].Weight < droneMaxWeight && locations.Count > 1)
                 {
-                    //locations.RemoveRange(0, i+1);
                     var itemToRemove = locations.SingleOrDefault(r => r == locations[i]);
                     if (itemToRemove != null)
                         locations.Remove(itemToRemove);
 
-                    List<Location> found = PickLocationsForCapacity(remainingCapacity /*- locations[i].Weight*/, locations);
+                    List<Location> found = PickLocationsForCapacity(remainingCapacity, locations);
                     bool isEmpty= IsEmpty(found);
 
                     if (isEmpty)
@@ -101,7 +69,6 @@ namespace DroneDeliveryService.Utils
                     }
                     if (found.Count > 0)
                     {
-                        //locationsPicked.Add(locations[i]);
                         locationsPicked.AddRange(found);
                         return locationsPicked;
                     }
@@ -109,7 +76,6 @@ namespace DroneDeliveryService.Utils
                 }
                 else if (locations[i].Weight <= droneMaxWeight)
                 {
-                    //locationsPicked.Add(locations[i]);
                     return locationsPicked;
                 }
                 locationsPicked = null;
